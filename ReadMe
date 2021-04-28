@@ -1,1 +1,5 @@
-
+1. download the zip file
+2. unzip it
+3. go to the 'webpage' file directory in the terminal
+4. run the command 'npm install'
+5. run the command 'sails lift' and enter 1
