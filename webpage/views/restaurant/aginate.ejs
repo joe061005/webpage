@@ -1,0 +1,314 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+        }
+
+    });
+
+</script>
+
+<style>
+    #intro {
+        margin: 40px;
+    }
+
+    .colmar {
+        margin: 20px;
+    }
+
+    .img {
+        width: 450px;
+        height: 450px
+    }
+
+    .downmar {
+        margin-bottom: 20px;
+    }
+</style>
+
+<body onload="load('<%= req.session.username%>', '<%= req.session.role%>')">
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="http://localhost:1337/">
+                <img src="https://pbs.twimg.com/profile_images/1208433111/Qpon_Logo.png" width="112" height="28">
+            </a>
+
+            <a role="button" class="navbar-burger burger" ar-label="menu" aria-exiapanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="http://localhost:1337/" class="navbar-item">
+                    Home
+                </a>
+
+                <a href="http://localhost:1337/search" class="navbar-item">
+                    Search
+                </a>
+
+                <a id="create" href="http://localhost:1337/create" class="navbar-item">
+                    Create
+                </a>
+
+                <a id="admin" href="http://localhost:1337/Admin" class="navbar-item">
+                    Admin
+                </a>
+
+                <a id="redeem" href="http://localhost:1337/redeem" class="navbar-item">
+                    My Redeemed Coupons
+                </a>
+
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div id="button" class="buttons">
+                        <a href="http://localhost:1337/login" class="button is-primary" id="login">
+                            <strong>Log in</strong>
+                        </a>
+                        <a href="http://localhost:1337/logout" class="button is-light" id="logout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="intro">
+        <p style="font-size: 20px"><b>Q-Pon</b></h1>
+        <p>Redeem your coins for dining coupons</p>
+    </section>
+
+    <div id="table" class="field-group columns">
+        <form action="/search" method="POST" onsubmit="submitForm(this);return false">
+            <div class="field column colmar is-inline-block-desktop">
+                <label class="label">Region</label>
+                <div class="control">
+                    <div>
+                        <select class="select downmar" name="region">
+                            <option value="">Not Specified</option>
+                            <option value="HK Island">HK Island</option>
+                            <option value="Kowloon">Kowloon</option>
+                            <option value="New Territories">New Territories</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label class="label">Min Coin</label>
+                <div class="control">
+                    <input class="input downmar" min=0 type="number" style="width: 400px" name="Mincoins">
+                </div>
+
+                <label class="label">Max Coin</label>
+                <div class="control">
+                    <input class="input downmar" min=0 type="number" style="width: 400px" name="Maxcoins">
+                </div>
+
+                <label class="label">Valid On</label>
+                <div class="control">
+                    <input class="input downmar" type="date" style="width: 400px" name="validon"
+                        vaule=value.toISOString()>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-link" type="submit" required>Submit</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <nav class="pagination colmar" role="navigation" aria-label="pagination">
+        <a class="pagination-previous" id="previousButton">Previous</a>
+        <a class="pagination-next" id="nextButton">Next page</a>
+        <ul class="pagination-list">
+            <li>
+                <a class="pagination-link" id="firstLink">1</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" id="previousLink">45</a>
+            </li>
+            <li>
+                <a class="pagination-link is-current" id="currentLink">46</a>
+            </li>
+            <li>
+                <a class="pagination-link" id="nextLink">47</a>
+            </li>
+            <li>
+                <span class="pagination-ellipsis">&hellip;</span>
+            </li>
+            <li>
+                <a class="pagination-link" id="lastLink">86</a>
+            </li>
+        </ul>
+    </nav>
+</body>
+
+<script>
+    async function submitForm(formElem) {
+        var data = new FormData(formElem)
+        var region = data.get("region");
+        var max = data.get("Maxcoins");
+        var min = data.get("Mincoins");
+        var date = data.get("validon");
+        var response = await fetch("/len?region=" + region + "&Maxcoins=" + max + "&Mincoins=" + min + "&validon=" + date);
+        if (response.ok) {
+            var restaurants = await response.json();
+        }
+
+        fetchPage(2, 0, data, restaurants.length);
+    };
+</script>
+
+<script>
+    function setPagination(limit, offset, data, no) {
+
+        var previousButton = document.getElementById("previousButton");
+        var nextButton = document.getElementById("nextButton");
+        var currentLink = document.getElementById("currentLink");
+        var previousLink = document.getElementById("previousLink");
+        var nextLink = document.getElementById("nextLink");
+        var firstLink = document.getElementById("firstLink");
+        var lastLink = document.getElementById("lastLink");
+
+        firstLink.onclick = function () { fetchPage(limit, 0, data, no) };
+        previousButton.onclick = function () { fetchPage(limit, offset - limit, data, no) };
+        previousLink.onclick = function () { fetchPage(limit, offset - limit, data, no) };
+        currentLink.onclick = function () { fetchPage(limit, offset, data, no) };
+        nextLink.onclick = function () { fetchPage(limit, offset + limit, data, no) };
+        nextButton.onclick = function () { fetchPage(limit, offset + limit, data, no) };
+        lastLink.onclick = function () { fetchPage(limit, ((Math.ceil(no / limit) - 1) * limit), data, no) };
+
+
+        var currentPageNumber = Math.floor(offset / limit) + 1;
+
+        previousLink.innerHTML = currentPageNumber - 1;
+        currentLink.innerHTML = currentPageNumber;
+        nextLink.innerHTML = currentPageNumber + 1;
+        lastLink.innerHTML = Math.ceil(no / limit);
+
+        if (offset < limit) {
+            previousButton.setAttribute("disabled", true);
+            previousLink.style.display = "none";
+        } else {
+            previousButton.removeAttribute("disabled");
+            previousLink.style.display = "block";
+        }
+
+        if (offset + limit >= no) {
+            nextButton.setAttribute("disabled", true);
+            nextLink.style.display = "none";
+        } else {
+            nextButton.removeAttribute("disabled");
+            nextLink.style.display = "block";
+        }
+    }
+
+</script>
+
+<script>
+    async function fetchPage(limit, offset, data, len) {
+
+        if (!data) {
+            var response = await fetch("/search?limit=" + limit + "&offset=" + offset + "&region=" + "&Maxcoins=" + "&Mincoins=" + "&validon=");
+
+        } else {
+            var response = await fetch("/search?limit=" + limit + "&offset=" + offset + "&region=" + data.get("region") + "&Maxcoins=" + data.get("Maxcoins") + "&Mincoins=" + data.get("Mincoins") + "&validon=" + data.get("validon"));
+        }
+
+
+        if (response.ok) {
+            var restaurants = await response.json();
+            var tb = document.getElementById("table");
+            document.querySelectorAll('.D').forEach(function (e) {
+                e.remove();
+            });
+
+            restaurants.forEach(function (restaurant) {
+                var dynamicCode = '';
+                dynamicCode += '<div class="D field column card colmar is-inline-block-desktop">'
+                dynamicCode += '<img style="display: block; object-fit: cover;" class="img" src="' + restaurant.image + '">'
+                dynamicCode += '<a target="_blank" href="http://localhost:1337/detail/' + restaurant.id + '"' + " style=" + "'font-size:20px;'" + "<b>" + restaurant.name + "</b></a>"
+                dynamicCode += '<p style="font-size: 10px">' + restaurant.title + '</p>'
+                dynamicCode += '<br>'
+                dynamicCode += '<p style="font-size: 10px">Coins: ' + restaurant.coins + '</p>'
+                dynamicCode += '</div>'
+                var temp = tb.innerHTML;
+                tb.innerHTML = "";
+                tb.innerHTML += dynamicCode + temp;
+            });
+
+            setPagination(limit, offset, data, len);
+
+        } else {
+            alert(response.status + ": " + response.statusText);
+        }
+    }
+
+    fetchPage(2, 0, "", "<%= numOfRecords%>");
+
+</script>
+
+<script>
+
+    async function load(name, role) {
+        if (!name) {
+            var lt = document.getElementById("logout");
+            lt.style.display = "none";
+        } else {
+            var bt = document.getElementById("button");
+            bt.removeChild(document.getElementById("login"));
+            var ele = document.createElement("p");
+            ele.innerHTML = "Hi, " + name;
+            ele.style.marginRight = "10px";
+            bt.insertBefore(ele, bt.children[0]);
+        }
+
+        if (role != "admin") {
+            var cr = document.getElementById("create");
+            var ad = document.getElementById("admin");
+
+            cr.style.display = "none";
+            ad.style.display = "none";
+        }
+
+        if(role != "member"){
+            var re = document.getElementById("redeem");
+            re.style.display = "none";
+        }
+
+    }
+
+</script>

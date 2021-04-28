@@ -1,0 +1,152 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+        }
+
+    });
+</script>
+
+<style>
+    #intro {
+        margin: 40px 40px;
+    }
+
+    #table {
+        margin-left: 40px;
+    }
+</style>
+
+<body onload="load('<%= req.session.username%>', '<%= req.session.role%>')">
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="http://localhost:1337/">
+                <img src="https://pbs.twimg.com/profile_images/1208433111/Qpon_Logo.png" width="112" height="28">
+            </a>
+
+            <a role="button" class="navbar-burger burger" ar-label="menu" aria-exiapanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="http://localhost:1337/" class="navbar-item">
+                    Home
+                </a>
+
+                <a href="http://localhost:1337/search" class="navbar-item">
+                    Search
+                </a>
+
+                <a id="create" href="http://localhost:1337/create" class="navbar-item">
+                    Create
+                </a>
+
+                <a id="admin" href="http://localhost:1337/Admin" class="navbar-item">
+                    Admin
+                </a>
+
+                <a id="redeem" href="http://localhost:1337/redeem" class="navbar-item">
+                    My Redeemed Coupons
+                </a>
+
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div id="button" class="buttons">
+                        <a href="http://localhost:1337/login" class="button is-primary" id="login">
+                            <strong>Log in</strong>
+                        </a>
+                        <a href="http://localhost:1337/logout" class="button is-light" id="logout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="intro">
+        <p style="font-size: 20px"><b>Q-Pon</b></h1>
+        <p>Redeem your coins for dining coupons</p>
+    </section>
+
+    <table id="table" class="table is-bordered is-striped is-hoverable ">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Restaurant</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <% restaurant.forEach(function(rest){ %>
+        <tr>
+            <td><%= rest.id%></td>
+            <td><%= rest.title%></td>
+            <td><%=rest.name%></td>
+            <td><a href="http://localhost:1337/delete/<%= rest.id%>">Update</a></td>
+            <td><a href = "http://localhost:1337/list/<%= rest.id%>" >Redeemed Members</a></td>
+        </tr>
+
+        <% }); %>
+
+    </table>
+
+</body>
+
+<script>
+
+    async function load(name, role) {
+        if (!name) {
+            var lt = document.getElementById("logout");
+            lt.style.display = "none";
+        } else {
+            var bt = document.getElementById("button");
+            bt.removeChild(document.getElementById("login"));
+            var ele = document.createElement("p");
+            ele.innerHTML = "Hi, " + name;
+            ele.style.marginRight = "10px";
+            bt.insertBefore(ele, bt.children[0]);
+        }
+
+        if (role != "admin") {
+            var cr = document.getElementById("create");
+            var ad = document.getElementById("admin");
+
+            cr.style.display = "none";
+            ad.style.display = "none";
+        }
+
+        if(role != "member"){
+            var re = document.getElementById("redeem");
+            re.style.display = "none";
+        }
+
+    }
+
+</script>

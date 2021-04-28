@@ -1,0 +1,288 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+        }
+
+    });
+
+    var HKIsland = ["IFC Mall", "Pacific Place", "Times Square"]
+    var Kowloon = ["Elements", "Harbour City", "Festival Walk", "MegaBox", "APM"]
+    var NewTerritories = ["New Town Plaza", "Tsuen Wan Plaza"]
+
+    function placeSelected(place, ml, name, role) {
+        var mall = document.getElementById("Mall");
+        mall.options.length = 0;
+
+        if (place == "HK Island") {
+            for (i = 0; i < HKIsland.length; i++) {
+                var option = document.createElement("option");
+                if (HKIsland[i] == ml) {
+                    option.setAttribute("selected", "selected");
+                }
+                option.text = HKIsland[i];
+                option.value = HKIsland[i];
+                mall.add(option);
+            };
+
+            mall.disabled = false;
+
+        } else if (place == "Kowloon") {
+            for (i = 0; i < Kowloon.length; i++) {
+                var option = document.createElement("option");
+                if (Kowloon[i] == ml) {
+                    option.setAttribute("selected", "selected");
+                }
+                option.text = Kowloon[i];
+                option.value = Kowloon[i];
+                mall.add(option);
+            };
+
+            mall.disabled = false;
+
+        } else if (place == "New Territories") {
+            for (i = 0; i < NewTerritories.length; i++) {
+                var option = document.createElement("option");
+                if (NewTerritories[i] == ml) {
+                    option.setAttribute("selected", "selected");
+                }
+                option.text = NewTerritories[i];
+                option.value = NewTerritories[i];
+                mall.add(option);
+            };
+
+            mall.disabled = false;
+        } else {
+            mall.disabled = true;
+        }
+
+        if (!name) {
+            var lt = document.getElementById("logout");
+            lt.style.display = "none";
+        } else {
+            var bt = document.getElementById("button");
+            bt.removeChild(document.getElementById("login"));
+            var ele = document.createElement("p");
+            ele.innerHTML = "Hi, " + name;
+            ele.style.marginRight = "10px";
+            bt.insertBefore(ele, bt.children[0]);
+        }
+
+        if (role != "admin") {
+            var cr = document.getElementById("create");
+            var ad = document.getElementById("admin");
+
+            cr.style.display = "none";
+            ad.style.display = "none";
+        }
+
+        if(role != "member"){
+            var re = document.getElementById("redeem");
+            re.style.display = "none";
+        }
+    }
+
+</script>
+
+<style>
+    .colmar {
+        margin: 20px;
+        border: 20px;
+
+    }
+
+    .sameline {
+        margin-right: 30px;
+    }
+</style>
+
+
+<body
+    onload="placeSelected('<%= rest.region%>', '<%= rest.mall%>', '<%= req.session.username%>', '<%= req.session.role%>')">
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="http://localhost:1337/">
+                <img src="https://pbs.twimg.com/profile_images/1208433111/Qpon_Logo.png" width="112" height="28">
+            </a>
+
+            <a role="button" class="navbar-burger burger" ar-label="menu" aria-exiapanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="http://localhost:1337/" class="navbar-item">
+                    Home
+                </a>
+
+                <a href="http://localhost:1337/search" class="navbar-item">
+                    Search
+                </a>
+
+                <a id="create" href="http://localhost:1337/create" class="navbar-item">
+                    Create
+                </a>
+
+                <a id="admin" href="http://localhost:1337/Admin" class="navbar-item">
+                    Admin
+                </a>
+
+                <a id="redeem" href="http://localhost:1337/redeem" class="navbar-item">
+                    My Redeemed Coupons
+                </a>
+
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div id="button" class="buttons">
+                        <a href="http://localhost:1337/login" class="button is-primary" id="login">
+                            <strong>Log in</strong>
+                        </a>
+                        <a href="http://localhost:1337/logout" class="button is-light" id="logout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <form class="colmar" action="/delete/<%= rest.id %>" method="post">
+
+        <div class="field-group">
+            <div class="field is-inline-block-desktop">
+                <label class="label">Title</label>
+                <div class="control">
+                    <input class="input sameline" type="text" style="width: 500px" name="title" value="<%= rest.title%>"
+                        required>
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Quota</label>
+                <div class="control">
+                    <input class="input sameline" min=0 type="number" style="width: 400px" name="quota"
+                        value="<%= rest.quota%>" required>
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Coins</label>
+                <div class="control">
+                    <input class="input sameline" min=0 type="number" style="width: 400px" name="coins"
+                        value="<%= rest.coins%>" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <div class="field is-inline-block-desktop">
+                <label class="label">Restaurant</label>
+                <div class="control">
+                    <input class="input sameline" type="text" style="width: 500px" name="name" value="<%= rest.name%>"
+                        required>
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Expiry Date</label>
+                <div class="control">
+                    <input class="input sameline" type="date" style="width: 840px" name="validtill"
+                        value="<%= rest.validtill%>" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <div class="field is-inline-block-desktop">
+                <label class="label">Region</label>
+                <div class="control">
+                    <div onload="region('123')" style="margin-right: 200px;" class="select">
+                        <select id="reg" name="region" onchange="placeSelected(this.value)" value="<%= rest.region%>"
+                            required>
+                            <option value="">Select the Region</option>
+                            <option id="hkisland" value="HK Island" <%= rest.region == "HK Island"? 'selected': '' %>>HK
+                                Island</option>
+                            <option id="kowloon" value="Kowloon" <%= rest.region == "Kowloon"? 'selected': '' %>>Kowloon
+                            </option>
+                            <option id="newterr" value="New Territories"
+                                <%= rest.region == "New Territories"? 'selected': '' %>>New Territories</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Mall</label>
+                <div class="control">
+                    <div style="margin-right: 200px;" class="select">
+                        <select name="mall" id="Mall" value="<%= rest.mall%>" required>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Image</label>
+                <div class="control">
+                    <input class="input sameline" type="text" style="width: 640px" name="image" value="<%= rest.image%>"
+                        required>
+                </div>
+            </div>
+
+            <div class="field is-inline-block-desktop">
+                <label class="label">Detail</label>
+                <div class="control">
+                    <textarea class="textarea sameline" cols="100" name="detail" required><%= rest.detail%></textarea>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="field-group">
+
+            <div style="margin-top: 20px" class="field is-inline-block-desktop">
+                <div class="control">
+                    <button name="action" value="Delete" style="background-color: red;  margin-right: 620px;"
+                        class="button is-link" type="submit" required>Delete</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px" class="field is-inline-block-desktop">
+                <div class="control">
+                    <button name="action" value="Update" class="button is-link" type="submit" required>submit</button>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+</body>
